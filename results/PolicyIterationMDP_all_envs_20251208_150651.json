@@ -1,0 +1,62 @@
+[
+  {
+    "algorithm": "PolicyIterationMDP",
+    "environment": "LineWorldSimple",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-06
+    },
+    "num_episodes": 20,
+    "training_time": 0.012159109115600586,
+    "evaluation": {
+      "mean_reward": -20.26547915826253,
+      "std_reward": 12.884785299244848,
+      "min_reward": -52.1,
+      "max_reward": -5.521753399641584,
+      "mean_steps": 20.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIterationMDP",
+    "environment": "GridWorld",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-06
+    },
+    "num_episodes": 30,
+    "training_time": 0.11983704566955566,
+    "evaluation": {
+      "mean_reward": -76.15564181008581,
+      "std_reward": 53.77796765635459,
+      "min_reward": -199.413600168917,
+      "max_reward": 23.543083424686593,
+      "mean_steps": 47.48,
+      "std_steps": 9.974447353111849,
+      "success_rate": 0.06,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIterationMDP",
+    "environment": "TwoRoundRPS",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-06
+    },
+    "num_episodes": 20,
+    "training_time": 0.0989229679107666,
+    "evaluation": {
+      "mean_reward": 0.73,
+      "std_reward": 0.4439594576084623,
+      "min_reward": "0",
+      "max_reward": "1",
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.73,
+      "total_episodes": 100
+    }
+  }
+]

@@ -1,0 +1,91 @@
+[
+  {
+    "algorithm": "Q-Learning",
+    "environment": "LineWorld",
+    "error": "empty range in randrange(5, 3)"
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "GridWorld",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 2000,
+    "training_time": 0.6141493320465088,
+    "evaluation": {
+      "mean_reward": -15.680000000000001,
+      "std_reward": 11.963344014112437,
+      "min_reward": -83.96000000000001,
+      "max_reward": -11.96,
+      "mean_steps": 50.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "TwoRoundRPS",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.0074312686920166016,
+    "evaluation": {
+      "mean_reward": 1.06,
+      "std_reward": 0.8345058418010026,
+      "min_reward": "0",
+      "max_reward": "2",
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.68,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "MontyHallLevel1",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.015858888626098633,
+    "evaluation": {
+      "mean_reward": 0.63,
+      "std_reward": 0.4828043081829324,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.63,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "MontyHallLevel2",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 1000,
+    "training_time": 0.050939083099365234,
+    "evaluation": {
+      "mean_reward": 0.52,
+      "std_reward": 0.49959983987187184,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 4.0,
+      "std_steps": 0.0,
+      "success_rate": 0.52,
+      "total_episodes": 100
+    }
+  }
+]

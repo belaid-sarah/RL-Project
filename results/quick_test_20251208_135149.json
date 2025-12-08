@@ -1,0 +1,86 @@
+[
+  {
+    "algorithm": "Q-Learning",
+    "environment": "GridWorld",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.14822053909301758,
+    "evaluation": {
+      "mean_reward": -17.48,
+      "std_reward": 16.49028805084981,
+      "min_reward": -83.96000000000002,
+      "max_reward": -11.96,
+      "mean_steps": 50.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 50
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "TwoRoundRPS",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 300,
+    "training_time": 0.004897356033325195,
+    "evaluation": {
+      "mean_reward": 0.8,
+      "std_reward": 0.8246211251235321,
+      "min_reward": "0",
+      "max_reward": "2",
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.54,
+      "total_episodes": 50
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "MontyHallLevel1",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 300,
+    "training_time": 0.011416196823120117,
+    "evaluation": {
+      "mean_reward": 0.48,
+      "std_reward": 0.49959983987187184,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.48,
+      "total_episodes": 50
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "MontyHallLevel2",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 300,
+    "training_time": 0.016852617263793945,
+    "evaluation": {
+      "mean_reward": 0.36,
+      "std_reward": 0.48,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 4.0,
+      "std_steps": 0.0,
+      "success_rate": 0.36,
+      "total_episodes": 50
+    }
+  }
+]

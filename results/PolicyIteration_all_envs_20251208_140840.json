@@ -1,0 +1,72 @@
+[
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "LineWorld",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-05
+    },
+    "num_episodes": 20,
+    "training_time": 13.190125465393066,
+    "evaluation": {
+      "mean_reward": -68.45853553487383,
+      "std_reward": 40.36781408503665,
+      "min_reward": -182.01045044545702,
+      "max_reward": -24.089132150654414,
+      "mean_steps": 30.27,
+      "std_steps": 10.365186925473171,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "GridWorld",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-05
+    },
+    "num_episodes": 30,
+    "training_time": 40.317440032958984,
+    "evaluation": {
+      "mean_reward": -44.50542593901637,
+      "std_reward": 40.616437694542064,
+      "min_reward": -158.86000000000007,
+      "max_reward": -10.876554223565137,
+      "mean_steps": 50.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "TwoRoundRPS",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-05
+    },
+    "num_episodes": 20,
+    "training_time": 0.0,
+    "evaluation": {
+      "mean_reward": 0.31,
+      "std_reward": 1.2057777573002415,
+      "min_reward": "-2",
+      "max_reward": "2",
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.47,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "MontyHallLevel1",
+    "error": "Action doit \u00eatre 0 (garder) ou 1 (changer)"
+  },
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "MontyHallLevel2",
+    "error": "list index out of range"
+  }
+]
