@@ -1,0 +1,107 @@
+[
+  {
+    "algorithm": "SARSA",
+    "environment": "LineWorldSimple",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 1000,
+    "training_time": 0.23931407928466797,
+    "evaluation": {
+      "mean_reward": -1.0,
+      "std_reward": 0.0,
+      "min_reward": -1.0,
+      "max_reward": -1.0,
+      "mean_steps": 60.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "SARSA",
+    "environment": "GridWorldSimple",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 1000,
+    "training_time": 0.7949090003967285,
+    "evaluation": {
+      "mean_reward": -12.0,
+      "std_reward": 0.0,
+      "min_reward": -12.0,
+      "max_reward": -12.0,
+      "mean_steps": 14.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "SARSA",
+    "environment": "TwoRoundRPS",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.011637210845947266,
+    "evaluation": {
+      "mean_reward": 1.0,
+      "std_reward": 0.7874007874011811,
+      "min_reward": "0",
+      "max_reward": "2",
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.69,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "SARSA",
+    "environment": "MontyHallLevel1",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.01805853843688965,
+    "evaluation": {
+      "mean_reward": 0.46,
+      "std_reward": 0.49839743177508444,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.46,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "SARSA",
+    "environment": "MontyHallLevel2",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.03156328201293945,
+    "evaluation": {
+      "mean_reward": 0.44,
+      "std_reward": 0.4963869458396343,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 4.0,
+      "std_steps": 0.0,
+      "success_rate": 0.44,
+      "total_episodes": 100
+    }
+  }
+]

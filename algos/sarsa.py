@@ -1,14 +1,17 @@
+"""
+SARSA - Sutton & Barto Chapter 6.4
+
+Formule exacte du livre :
+Q(S_t, A_t) ← Q(S_t, A_t) + α[R_{t+1} + γ Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t)]
+"""
+
 from algos.base_agent import BaseAgent
-import numpy as np
 import random
 import time
 
 class SARSAAgent(BaseAgent):
     """
-    SARSA (State-Action-Reward-State-Action)
-    
-    Algorithme on-policy de TD Learning qui apprend Q(s,a) en utilisant
-    la valeur de l'action suivante selon la politique d'exploration.
+    SARSA - On-policy TD Control (Sutton & Barto 6.4)
     """
     
     def __init__(self, env, alpha=0.1, gamma=0.99, epsilon=0.1, **kwargs):
@@ -17,59 +20,66 @@ class SARSAAgent(BaseAgent):
         self.gamma = gamma
         self.epsilon = epsilon
         
-        # Q-table: (state, action) -> value
-        self.q_table = {}
+        # Q-table: Q(s, a)
+        self.Q = {}
     
     def _get_state_key(self, state):
-        """Convertit un état en clé hashable"""
+        """Convertit état en clé hashable"""
         if isinstance(state, dict):
             return tuple(sorted(state.items()))
-        elif isinstance(state, (list, np.ndarray)):
-            return tuple(state)
+        elif isinstance(state, (list, tuple)) and len(state) > 0:
+            return tuple(state) if not isinstance(state[0], tuple) else state
         else:
             return state
     
     def get_q(self, state, action):
         """Retourne Q(state, action)"""
         state_key = self._get_state_key(state)
-        return self.q_table.get((state_key, action), 0.0)
+        return self.Q.get((state_key, action), 0.0)
     
     def set_q(self, state, action, value):
         """Met à jour Q(state, action)"""
         state_key = self._get_state_key(state)
-        self.q_table[(state_key, action)] = value
+        self.Q[(state_key, action)] = value
     
     def select_action(self, state, training=False):
-        """Sélectionne une action selon epsilon-greedy"""
+        """
+        Epsilon-greedy (Sutton & Barto 2.7)
+        """
         state_key = self._get_state_key(state)
         actions = self.env.action_space
         
         if training and random.random() < self.epsilon:
             return random.choice(actions)
         
-        # Greedy selon Q
         q_values = [self.get_q(state, a) for a in actions]
         max_q = max(q_values)
         best_actions = [a for a, q in zip(actions, q_values) if q == max_q]
         return random.choice(best_actions)
     
-    def update(self, state, action, reward, next_state, done):
-        """Met à jour Q avec la formule SARSA"""
+    def update(self, state, action, reward, next_state, next_action, done):
+        """
+        SARSA update (Sutton & Barto 6.4)
+        Q(S_t, A_t) ← Q(S_t, A_t) + α[R_{t+1} + γ Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t)]
+        """
         state_key = self._get_state_key(state)
-        next_state_key = self._get_state_key(next_state)
         
-        # Action suivante selon la politique (epsilon-greedy)
-        next_action = self.select_action(next_state, training=True)
-        next_q = 0 if done else self.get_q(next_state, next_action)
+        # TD Target: R_{t+1} + γ Q(S_{t+1}, A_{t+1})
+        if done:
+            next_q = 0.0
+        else:
+            next_q = self.get_q(next_state, next_action)
         
-        # Formule SARSA: Q(s,a) = Q(s,a) + alpha * (r + gamma * Q(s',a') - Q(s,a))
+        # SARSA update
         current_q = self.get_q(state, action)
         td_target = reward + self.gamma * next_q
         new_q = current_q + self.alpha * (td_target - current_q)
         self.set_q(state, action, new_q)
     
     def train(self, num_episodes, verbose=True, max_steps_per_episode=1000):
-        """Entraîne l'agent avec SARSA"""
+        """
+        Entraîne avec SARSA
+        """
         start_time = time.time()
         
         for episode in range(num_episodes):
@@ -80,20 +90,22 @@ class SARSAAgent(BaseAgent):
             steps = 0
             
             while not done and steps < max_steps_per_episode:
+                # Exécuter action
                 next_state, reward, done, _ = self.env.step(action)
                 total_reward += reward
                 steps += 1
                 
-                # Mettre à jour Q
-                self.update(state, action, reward, next_state, done)
-                
-                # Action suivante
+                # Choisir action suivante (pour SARSA)
                 if not done:
-                    action = self.select_action(next_state, training=True)
+                    next_action = self.select_action(next_state, training=True)
+                else:
+                    next_action = 0  # Action dummy si terminé
+                
+                # Mettre à jour Q
+                self.update(state, action, reward, next_state, next_action, done)
+                
                 state = next_state
-            
-            if steps >= max_steps_per_episode:
-                done = True
+                action = next_action
             
             self.episode_rewards.append(total_reward)
             self.episode_lengths.append(steps)

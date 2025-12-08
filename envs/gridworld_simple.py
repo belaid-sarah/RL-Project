@@ -1,5 +1,5 @@
 """
-LineWorld Simplifié - Inspiré de Sutton & Barto
+GridWorld Simplifié - Inspiré de Sutton & Barto
 
 Environnement simple avec rewards standards :
 - -1 par step (coût de mouvement)
@@ -11,9 +11,9 @@ Environnement simple avec rewards standards :
 from .utils import BaseEnv
 import random
 
-class LineWorldSimple(BaseEnv):
+class GridWorldSimple(BaseEnv):
     """
-    LineWorld simplifié style Sutton & Barto
+    GridWorld simplifié style Sutton & Barto
     
     Rewards standards :
     - -1 par step (coût de mouvement)
@@ -21,27 +21,28 @@ class LineWorldSimple(BaseEnv):
     - 0 pour obstacles (reste sur place)
     """
     
-    def __init__(self, length=10):
+    def __init__(self, width=5, height=5):
         super().__init__()
-        self.length = length
-        self.start = 0
-        self.goal = length - 1
+        self.width = width
+        self.height = height
+        self.start = (0, 0)
+        self.goal = (width-1, height-1)
         self.state = self.start
         self.done = False
         
-        # Obstacles statiques seulement (10-15% de la ligne)
+        # Obstacles statiques seulement (10-15% de la grille)
         self.obstacles = self._generate_obstacles()
         
         self.step_count = 0
-        self.max_steps = length * 3
+        self.max_steps = width * height * 3  # Limite raisonnable
     
     def _generate_obstacles(self):
-        """Génère des obstacles statiques (10-15% de la ligne)"""
+        """Génère des obstacles statiques (10-15% de la grille)"""
         obstacles = set()
-        num_obstacles = int(self.length * 0.12)
+        num_obstacles = int(self.width * self.height * 0.12)
         
         while len(obstacles) < num_obstacles:
-            pos = random.randint(1, self.length - 2)
+            pos = (random.randint(0, self.width-1), random.randint(0, self.height-1))
             if pos != self.start and pos != self.goal:
                 obstacles.add(pos)
         
@@ -53,7 +54,7 @@ class LineWorldSimple(BaseEnv):
         self.done = False
         self.step_count = 0
         
-        # Régénérer obstacles (optionnel)
+        # Régénérer obstacles (optionnel : garder les mêmes)
         # self.obstacles = self._generate_obstacles()
         
         return self.state
@@ -62,7 +63,7 @@ class LineWorldSimple(BaseEnv):
         """
         Exécute une action
         
-        Actions: 0=gauche, 1=droite
+        Actions: 0=haut, 1=bas, 2=gauche, 3=droite
         
         Rewards standards (Sutton & Barto) :
         - -1 par step
@@ -73,24 +74,32 @@ class LineWorldSimple(BaseEnv):
             return self.state, 0, True, {}
         
         self.step_count += 1
-        old_state = self.state
+        x, y = self.state
         
         # Déplacement
-        if action == 0:  # Gauche
-            self.state = max(0, self.state - 1)
-        elif action == 1:  # Droite
-            self.state = min(self.length - 1, self.state + 1)
+        if action == 0:  # Haut
+            y = max(0, y - 1)
+        elif action == 1:  # Bas
+            y = min(self.height - 1, y + 1)
+        elif action == 2:  # Gauche
+            x = max(0, x - 1)
+        elif action == 3:  # Droite
+            x = min(self.width - 1, x + 1)
         else:
             raise ValueError(f"Action invalide: {action}")
+        
+        new_state = (x, y)
         
         # Reward standard : -1 par step
         reward = -1.0
         
         # Vérifier obstacle
-        if self.state in self.obstacles:
-            # Reste sur place, reward = 0
-            self.state = old_state
+        if new_state in self.obstacles:
+            # Reste sur place, reward = 0 (pas de coût)
+            new_state = self.state
             reward = 0.0
+        else:
+            self.state = new_state
         
         # Goal : +1 (reward standard)
         if self.state == self.goal:
@@ -107,50 +116,17 @@ class LineWorldSimple(BaseEnv):
     
     def sample_action(self):
         """Retourne une action aléatoire"""
-        return random.randint(0, 1)
+        return random.randint(0, 3)
     
     def n_actions(self):
         """Retourne le nombre d'actions possibles"""
-        return 2
+        return 4
     
     def get_all_states(self):
         """Retourne tous les états possibles"""
-        return list(range(self.length))
+        return [(x, y) for x in range(self.width) for y in range(self.height)]
     
     def get_all_actions(self):
         """Retourne toutes les actions possibles"""
-        return [0, 1]
-    
-    def get_transition_model(self):
-        """
-        Construit le modèle MDP complet : p[s, a, s', r]
-        """
-        model = {}
-        states = self.get_all_states()
-        actions = self.get_all_actions()
-        
-        for s in states:
-            for a in actions:
-                # Sauvegarder
-                old_state = self.state
-                old_obstacles = self.obstacles.copy()
-                old_step_count = self.step_count
-                
-                # Simuler
-                self.state = s
-                self.step_count = 0
-                self.done = False
-                
-                next_state, reward, done, _ = self.step(a)
-                reward = round(reward)  # -1, 0, ou 1
-                
-                # Stocker
-                key = (s, a, next_state, reward)
-                model[key] = 1.0
-                
-                # Restaurer
-                self.state = old_state
-                self.obstacles = old_obstacles
-                self.step_count = old_step_count
-        
-        return model
+        return [0, 1, 2, 3]
+

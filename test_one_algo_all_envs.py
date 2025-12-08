@@ -6,6 +6,7 @@ Parfait pour commencer et voir les différences entre environnements
 from envs.lineworld import LineWorld
 from envs.lineworld_simple import LineWorldSimple
 from envs.gridworld import GridWorld
+from envs.gridworld_simple import GridWorldSimple
 from envs.rps import TwoRoundRPS
 from envs.monty_hall_level1 import MontyHallLevel1
 from envs.monty_hall_level2 import MontyHallLevel2
@@ -19,31 +20,23 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
     
     # Tous les environnements
     all_environments = {
-        'LineWorld': lambda: LineWorld(length=10),
-        'LineWorldSimple': lambda: LineWorldSimple(length=10),  # Version simplifiée
-        'GridWorld': lambda: GridWorld(width=5, height=5),
+        'LineWorldSimple': lambda: LineWorldSimple(length=20),  # Version simple, peut être agrandie
+        'GridWorldSimple': lambda: GridWorldSimple(width=8, height=8),  # Version simple, peut être agrandie
         'TwoRoundRPS': lambda: TwoRoundRPS(),
         'MontyHallLevel1': lambda: MontyHallLevel1(),
         'MontyHallLevel2': lambda: MontyHallLevel2(),
     }
     
-    # Pour Policy Iteration et Value Iteration, utiliser LineWorldSimple
-    if algo_name in ['PolicyIteration', 'ValueIteration', 'PolicyIterationMDP']:
-        # Utiliser la version simplifiée de LineWorld
+    # Pour Policy Iteration et Value Iteration, utiliser les versions simples
+    if algo_name in ['PolicyIteration', 'ValueIteration']:
         environments = {
-            'LineWorldSimple': lambda: LineWorldSimple(length=10),
-            'GridWorld': all_environments['GridWorld'],
+            'LineWorldSimple': lambda: LineWorldSimple(length=20),
+            'GridWorldSimple': lambda: GridWorldSimple(width=8, height=8),
             'TwoRoundRPS': all_environments['TwoRoundRPS'],
         }
-        print("⚠️  Note: Policy/Value Iteration utilise LineWorldSimple (version simplifiée)")
+        print("[NOTE] Utilisation des environnements simplifies (rewards standards Sutton & Barto)")
     else:
-        environments = {
-            'LineWorld': all_environments['LineWorld'],
-            'GridWorld': all_environments['GridWorld'],
-            'TwoRoundRPS': all_environments['TwoRoundRPS'],
-            'MontyHallLevel1': all_environments['MontyHallLevel1'],
-            'MontyHallLevel2': all_environments['MontyHallLevel2'],
-        }
+        environments = all_environments
     
     # Nombre d'épisodes par environnement (certains sont plus simples)
     episodes_by_env = {
@@ -55,10 +48,10 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
     }
     
     # Pour Policy/Value Iteration, utiliser moins d'itérations
-    if algo_name in ['PolicyIteration', 'ValueIteration', 'PolicyIterationMDP']:
+    if algo_name in ['PolicyIteration', 'ValueIteration']:
         episodes_by_env = {
             'LineWorldSimple': 20,  # Itérations de convergence
-            'GridWorld': 30,  # Itérations de convergence
+            'GridWorldSimple': 30,  # Itérations de convergence
             'TwoRoundRPS': 20,
         }
     
@@ -79,9 +72,9 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
     results = []
     
     for env_name, env_factory in environments.items():
-        print(f"\n{'─'*70}")
-        print(f"🌍 Environnement: {env_name}")
-        print(f"{'─'*70}")
+        print(f"\n{'-'*70}")
+        print(f"Environnement: {env_name}")
+        print(f"{'-'*70}")
         
         try:
             # Créer l'environnement
@@ -96,18 +89,18 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
             
             # Policy Iteration et Value Iteration utilisent num_iterations au lieu de num_episodes
             if algo_name in ['PolicyIteration', 'ValueIteration']:
-                print(f"📚 Entraînement: {num_eps} itérations...")
+                print(f"[ENTRAINEMENT] {num_eps} iterations...")
                 agent.train(num_episodes=num_eps, verbose=False)
             else:
-                print(f"📚 Entraînement: {num_eps} épisodes (max {max_steps} steps/épisode)...")
+                print(f"[ENTRAINEMENT] {num_eps} episodes (max {max_steps} steps/episode)...")
                 agent.train(num_episodes=num_eps, verbose=False, max_steps_per_episode=max_steps)
             
             # Évaluer
-            print(f"📊 Évaluation: 100 épisodes...")
+            print(f"[EVALUATION] 100 episodes...")
             eval_results = agent.evaluate(num_episodes=100, verbose=False)
             
             # Afficher les résultats
-            print(f"✅ Résultats:")
+            print(f"[OK] Resultats:")
             print(f"   Récompense moyenne: {eval_results['mean_reward']:7.2f} ± {eval_results['std_reward']:5.2f}")
             print(f"   Taux de succès:      {eval_results['success_rate']*100:6.1f}%")
             print(f"   Steps moyens:        {eval_results['mean_steps']:6.1f}")
@@ -123,7 +116,7 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
             })
             
         except Exception as e:
-            print(f"❌ Erreur: {str(e)}")
+            print(f"[ERREUR] {str(e)}")
             results.append({
                 'algorithm': algo_name,
                 'environment': env_name,
@@ -132,10 +125,10 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
     
     # Afficher le résumé
     print(f"\n\n{'='*70}")
-    print("📊 RÉSUMÉ - Performance par environnement")
+    print("RESUME - Performance par environnement")
     print(f"{'='*70}")
     print(f"{'Environnement':<20} | {'Reward Moy':>12} | {'Success %':>10} | {'Temps (s)':>10}")
-    print(f"{'─'*70}")
+    print(f"{'-'*70}")
     
     successful = [r for r in results if 'evaluation' in r]
     for result in successful:
@@ -150,10 +143,10 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
         best = max(successful, key=lambda x: x['evaluation']['mean_reward'])
         worst = min(successful, key=lambda x: x['evaluation']['mean_reward'])
         
-        print(f"\n🏆 Meilleur environnement: {best['environment']}")
+        print(f"\n[MEILLEUR] Environnement: {best['environment']}")
         print(f"   Reward: {best['evaluation']['mean_reward']:.2f}")
         
-        print(f"\n⚠️  Plus difficile: {worst['environment']}")
+        print(f"\n[PLUS DIFFICILE] Environnement: {worst['environment']}")
         print(f"   Reward: {worst['evaluation']['mean_reward']:.2f}")
     
     # Sauvegarder
@@ -164,7 +157,7 @@ def test_one_algo_all_envs(algo_class, algo_name, hyperparams, num_episodes=1000
     with open(filename, 'w') as f:
         json.dump(results, f, indent=2, default=str)
     
-    print(f"\n✅ Résultats sauvegardés: {filename}")
+    print(f"\n[OK] Resultats sauvegardes: {filename}")
     
     return results
 
@@ -173,7 +166,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Tester un algorithme sur tous les environnements')
     parser.add_argument('--algo', type=str, default='Q-Learning', 
-                       choices=['Q-Learning', 'SARSA', 'MonteCarlo', 'Dyna-Q', 'PolicyIteration', 'ValueIteration', 'PolicyIterationMDP'],
+                       choices=['Q-Learning', 'SARSA', 'MonteCarlo', 'Dyna-Q', 'PolicyIteration', 'ValueIteration'],
                        help='Algorithme à tester')
     parser.add_argument('--alpha', type=float, default=0.1, help='Taux d\'apprentissage')
     parser.add_argument('--gamma', type=float, default=0.99, help='Facteur d\'actualisation')
@@ -207,10 +200,6 @@ if __name__ == "__main__":
         from algos.value_iteration import ValueIteration
         algo_class = ValueIteration
         hyperparams = {'gamma': args.gamma, 'theta': 1e-5}
-    elif args.algo == 'PolicyIterationMDP':
-        from algos.policy_iteration_mdp import PolicyIterationMDP
-        algo_class = PolicyIterationMDP
-        hyperparams = {'gamma': args.gamma, 'theta': 1e-6}
     else:
         print(f"Algorithme {args.algo} non supporté")
         exit(1)

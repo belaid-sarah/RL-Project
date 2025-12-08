@@ -1,0 +1,107 @@
+[
+  {
+    "algorithm": "Q-Learning",
+    "environment": "LineWorldSimple",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 1000,
+    "training_time": 0.28791141510009766,
+    "evaluation": {
+      "mean_reward": -5.0,
+      "std_reward": 0.0,
+      "min_reward": -5.0,
+      "max_reward": -5.0,
+      "mean_steps": 60.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "GridWorldSimple",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 1000,
+    "training_time": 1.4414234161376953,
+    "evaluation": {
+      "mean_reward": 0.0,
+      "std_reward": 0.0,
+      "min_reward": 0.0,
+      "max_reward": 0.0,
+      "mean_steps": 192.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "TwoRoundRPS",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.020678997039794922,
+    "evaluation": {
+      "mean_reward": 1.14,
+      "std_reward": 0.8248636250920511,
+      "min_reward": "0",
+      "max_reward": "2",
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.72,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "MontyHallLevel1",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.024605274200439453,
+    "evaluation": {
+      "mean_reward": 0.46,
+      "std_reward": 0.49839743177508444,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 2.0,
+      "std_steps": 0.0,
+      "success_rate": 0.46,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "Q-Learning",
+    "environment": "MontyHallLevel2",
+    "hyperparameters": {
+      "alpha": 0.1,
+      "gamma": 0.99,
+      "epsilon": 0.1
+    },
+    "num_episodes": 500,
+    "training_time": 0.05010533332824707,
+    "evaluation": {
+      "mean_reward": 0.45,
+      "std_reward": 0.49749371855331004,
+      "min_reward": 0.0,
+      "max_reward": 1.0,
+      "mean_steps": 4.0,
+      "std_steps": 0.0,
+      "success_rate": 0.45,
+      "total_episodes": 100
+    }
+  }
+]

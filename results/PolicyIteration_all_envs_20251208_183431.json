@@ -1,0 +1,47 @@
+[
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "LineWorldSimple",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-05
+    },
+    "num_episodes": 20,
+    "training_time": 0.12003636360168457,
+    "evaluation": {
+      "mean_reward": -9.0,
+      "std_reward": 0.0,
+      "min_reward": -9.0,
+      "max_reward": -9.0,
+      "mean_steps": 60.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "GridWorldSimple",
+    "hyperparameters": {
+      "gamma": 0.99,
+      "theta": 1e-05
+    },
+    "num_episodes": 30,
+    "training_time": 3.1660783290863037,
+    "evaluation": {
+      "mean_reward": -12.0,
+      "std_reward": 0.0,
+      "min_reward": -12.0,
+      "max_reward": -12.0,
+      "mean_steps": 14.0,
+      "std_steps": 0.0,
+      "success_rate": 0.0,
+      "total_episodes": 100
+    }
+  },
+  {
+    "algorithm": "PolicyIteration",
+    "environment": "TwoRoundRPS",
+    "error": "Environnement non supporte pour Policy Iteration"
+  }
+]
