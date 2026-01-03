@@ -21,7 +21,21 @@ class GridWorldSimple(BaseEnv):
     - 0 pour obstacles (reste sur place)
     """
     
-    def __init__(self, width=5, height=5):
+    def __init__(self, width=10, height=10):
+        """
+        Initialise l'environnement GridWorld
+        
+        Args:
+            width: Largeur de la grille
+            height: Hauteur de la grille
+                   Recommandé: 8x8 à 12x12 pour un bon équilibre complexité/performance
+                   Max recommandé: ~15x15 pour Dynamic Programming, ~20x20+ pour TD methods
+                   
+        Note: Le nombre d'états = width × height
+              - 10x10 = 100 états (bon équilibre)
+              - 15x15 = 225 états (plus difficile)
+              - 20x20 = 400 états (très difficile, TD methods recommandées)
+        """
         super().__init__()
         self.width = width
         self.height = height
@@ -34,7 +48,9 @@ class GridWorldSimple(BaseEnv):
         self.obstacles = self._generate_obstacles()
         
         self.step_count = 0
-        self.max_steps = width * height * 3  # Limite raisonnable
+        # Max steps adaptatif : plus de temps pour les grilles plus grandes
+        # Formule: nombre d'états × 4 (plus généreux pour chemins complexes)
+        self.max_steps = width * height * 4
     
     def _generate_obstacles(self):
         """Génère des obstacles statiques (10-15% de la grille)"""
@@ -90,28 +106,34 @@ class GridWorldSimple(BaseEnv):
         
         new_state = (x, y)
         
+        # Goal : reward finale positive (PRIORITÉ)
+        if new_state == self.goal:
+            self.state = new_state
+            reward = 10.0  # Reward finale positive standard
+            self.done = True
+            return self.state, reward, self.done, {
+                'step_count': self.step_count,
+                'goal_reached': True
+            }
+        
         # Reward standard : -1 par step
         reward = -1.0
         
         # Vérifier obstacle
         if new_state in self.obstacles:
-            # Reste sur place, reward = 0 (pas de coût)
+            # Reste sur place, reward = -1 (même coût qu'un step)
             new_state = self.state
-            reward = 0.0
+            reward = -1.0
         else:
             self.state = new_state
-        
-        # Goal : +1 (reward standard)
-        if self.state == self.goal:
-            reward = 1.0
-            self.done = True
         
         # Timeout
         if self.step_count >= self.max_steps:
             self.done = True
         
         return self.state, reward, self.done, {
-            'step_count': self.step_count
+            'step_count': self.step_count,
+            'goal_reached': self.state == self.goal  # Indicateur explicite pour le success
         }
     
     def sample_action(self):

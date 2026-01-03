@@ -1,5 +1,10 @@
-import pygame
 import sys
+from pathlib import Path
+
+# Ajouter le répertoire parent au path pour les imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import pygame
 from envs.rps import TwoRoundRPS
 
 # --- Initialisation Pygame ---
@@ -82,16 +87,16 @@ def draw_game():
     
     # Informations du round
     if env.round == 0:
-        instruction = "🎮 ROUND 1: Choose your move!"
+        instruction = "ROUND 1: Choose your move!"
         color = WHITE
     elif env.round == 1 and not show_round1_result:
-        instruction = "⏳ Round 1 in progress..."
+        instruction = "Round 1 in progress..."
         color = BLUE
     elif env.round == 1 and show_round1_result:
-        instruction = "🎮 ROUND 2: Choose your move!"
+        instruction = "ROUND 2: Choose your move!"
         color = GREEN
     elif env.round == 2:
-        instruction = "🏁 Game Over!"
+        instruction = "Game Over!"
         color = GOLD
     
     inst_text = font_medium.render(instruction, True, color)
@@ -128,7 +133,7 @@ def draw_game():
         # Hint pour Round 2
         if env.round == 1:
             hint = font_tiny.render(
-                f"💡 Opponent will play: {NAMES[env.agent_round1_choice]}", 
+                f"Hint: Opponent will play: {NAMES[env.agent_round1_choice]}", 
                 True, GOLD
             )
             screen.blit(hint, (50, round1_y + 145))
@@ -138,7 +143,7 @@ def draw_game():
         round2_y = 200 if not show_round1_result else 380
         
         # Résumé complet
-        summary_title = font_medium.render("📊 GAME SUMMARY", True, GOLD)
+        summary_title = font_medium.render("GAME SUMMARY", True, GOLD)
         summary_rect = summary_title.get_rect(center=(screen_width//2, round2_y))
         screen.blit(summary_title, summary_rect)
         

@@ -108,8 +108,25 @@ class BaseAgent(ABC):
             total_rewards.append(episode_reward)
             total_steps.append(steps)
             
-            # Considérer comme succès si reward positif
-            if episode_reward > 0:
+            # Considérer comme succès si le goal est atteint
+            # Vérifier dans l'état final ou dans info
+            goal_reached = False
+            if done:
+                # Vérifier si l'état final est le goal
+                if hasattr(self.env, 'goal'):
+                    if hasattr(self.env, 'state'):
+                        if self.env.state == self.env.goal:
+                            goal_reached = True
+                    # Alternative: vérifier dans info si disponible
+                    if 'goal_reached' in info:
+                        goal_reached = info['goal_reached']
+            
+            # Fallback: considérer comme succès si reward positif ET done=True
+            # (pour les environnements qui n'ont pas de goal explicite)
+            if not goal_reached and done and episode_reward > 0:
+                goal_reached = True
+            
+            if goal_reached:
                 success_count += 1
             
             if verbose and (episode + 1) % 10 == 0:
@@ -152,7 +169,7 @@ class BaseAgent(ABC):
         with open(path, 'wb') as f:
             pickle.dump(save_data, f)
         
-        print(f"✅ Agent sauvegardé : {path}")
+        print(f"[OK] Agent sauvegarde : {path}")
     
     def load(self, path):
         """
@@ -171,7 +188,7 @@ class BaseAgent(ABC):
         self.training_time = save_data['training_time']
         self.convergence_episode = save_data.get('convergence_episode')
         
-        print(f"✅ Agent chargé : {path}")
+        print(f"[OK] Agent charge : {path}")
     
     def _get_state_key(self, state):
         """

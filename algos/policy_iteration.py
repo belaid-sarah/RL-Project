@@ -47,6 +47,9 @@ class PolicyIteration(BaseAgent):
                 self.actions.add(a)
             self.states = list(self.states)
             self.actions = list(self.actions)
+        elif hasattr(self.env, 'secret_env') and hasattr(self.env.secret_env, 'num_states'):
+            # Environnement secret avec méthodes MDP
+            self._build_model_from_mdp()
         else:
             # Construire le modèle en explorant
             self._build_model()
@@ -57,40 +60,112 @@ class PolicyIteration(BaseAgent):
             self.policy[s] = random.choice(self.actions)
     
     def _build_model(self):
-        """Construit le modèle MDP en explorant l'environnement"""
-        # Pour environnements simples (LineWorldSimple, GridWorldSimple)
+        """
+        Construit le modèle MDP en explorant l'environnement systématiquement.
+        
+        Le modèle MDP est : p(s', r | s, a) = probabilité d'aller en s' avec reward r
+        depuis l'état s avec l'action a.
+        
+        Pour Policy/Value Iteration, on a besoin de TOUTES les transitions possibles.
+        Si l'environnement ne fournit pas le modèle directement, on le construit en :
+        1. Identifiant tous les états possibles
+        2. Identifiant toutes les actions possibles
+        3. Testant chaque transition (s, a) → (s', r)
+        4. Enregistrant le résultat dans self.model
+        
+        Exemple pour LineWorldSimple (length=5) :
+        - États : [0, 1, 2, 3, 4]
+        - Actions : [0 (gauche), 1 (droite)]
+        - On teste : (0,0), (0,1), (1,0), (1,1), ..., (4,0), (4,1)
+        - Résultat : model[(s, a, s_next, r)] = 1.0 pour chaque transition
+        """
+        # ÉTAPE 1 : Identifier tous les états possibles
         if hasattr(self.env, 'length'):
-            # LineWorld
+            # LineWorld : états = positions de 0 à length-1
             self.states = list(range(self.env.length))
             self.actions = [0, 1]  # gauche, droite
         elif hasattr(self.env, 'width') and hasattr(self.env, 'height'):
-            # GridWorld
+            # GridWorld : états = toutes les positions (x, y)
             self.states = [(x, y) for x in range(self.env.width) 
                           for y in range(self.env.height)]
             self.actions = list(range(self.env.n_actions()))
         else:
             raise ValueError("Environnement non supporte pour Policy Iteration")
         
-        # Construire le modèle
+        # ÉTAPE 2 : Construire le modèle en testant toutes les transitions
+        print(f"Construction du modèle MDP : {len(self.states)} états × {len(self.actions)} actions = {len(self.states) * len(self.actions)} transitions à tester...")
+        
         for s in self.states:
             for a in self.actions:
-                # Tester la transition
+                # ÉTAPE 3 : Tester la transition (s, a) → (s', r)
                 try:
+                    # Sauvegarder l'état actuel de l'environnement
                     old_state = getattr(self.env, 'state', None)
+                    old_done = getattr(self.env, 'done', False)
+                    
+                    # Réinitialiser et forcer l'état à s
                     self.env.reset()
                     if hasattr(self.env, 'state'):
                         self.env.state = s
+                    if hasattr(self.env, 'done'):
+                        self.env.done = False
                     
-                    s_next, r, done, _ = self.env.step(a)
-                    r = round(r, 1)  # Arrondir pour regrouper
+                    # ÉTAPE 4 : Exécuter l'action a depuis l'état s
+                    s_next, r, done, info = self.env.step(a)
                     
+                    # Arrondir le reward pour regrouper les valeurs similaires
+                    r = round(r, 1)
+                    
+                    # ÉTAPE 5 : Enregistrer la transition dans le modèle
+                    # Clé : (état_source, action, état_destination, reward)
+                    # Valeur : probabilité (1.0 = déterministe)
                     key = (s, a, s_next, r)
-                    self.model[key] = 1.0  # Déterministe
+                    self.model[key] = 1.0  # Environnement déterministe
                     
+                    # Restaurer l'état de l'environnement si possible
                     if old_state is not None:
                         self.env.state = old_state
-                except:
+                    if hasattr(self.env, 'done'):
+                        self.env.done = old_done
+                except Exception as e:
+                    # Si une transition échoue, on l'ignore
+                    # (peut arriver pour des états invalides)
                     pass
+        
+        print(f"[OK] Modele MDP construit : {len(self.model)} transitions enregistrees")
+    
+    def _build_model_from_mdp(self):
+        """
+        Construit le modèle MDP à partir des méthodes MDP de l'environnement secret.
+        
+        Les environnements secrets fournissent :
+        - num_states() : nombre d'états
+        - num_actions() : nombre d'actions
+        - num_rewards() : nombre de rewards possibles
+        - p(s, a, s_p, r_index) : probabilité de transition
+        - reward(r_index) : valeur du reward
+        """
+        secret_env = self.env.secret_env
+        num_states = secret_env.num_states()
+        num_actions = secret_env.num_actions()
+        num_rewards = secret_env.num_rewards()
+        
+        self.states = list(range(num_states))
+        self.actions = list(range(num_actions))
+        
+        print(f"Construction du modèle MDP depuis méthodes MDP : {num_states} états × {num_actions} actions...")
+        
+        for s in self.states:
+            for a in self.actions:
+                for s_next in range(num_states):
+                    for r_idx in range(num_rewards):
+                        prob = secret_env.p(s, a, s_next, r_idx)
+                        if prob > 0:
+                            reward = secret_env.reward(r_idx)
+                            key = (s, a, s_next, reward)
+                            self.model[key] = prob
+        
+        print(f"[OK] Modele MDP construit : {len(self.model)} transitions enregistrees")
     
     def _get_p(self, s, a, s_next, r):
         """Retourne p(s', r | s, a)"""
@@ -202,3 +277,65 @@ class PolicyIteration(BaseAgent):
     def select_action(self, state, training=False):
         """Sélectionne action selon la politique"""
         return self.policy.get(state, random.choice(self.actions))
+    
+    def save(self, path):
+        """
+        Sauvegarde l'agent avec V(s) et policy complètes
+        """
+        from pathlib import Path
+        import pickle
+        
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        
+        save_data = {
+            'name': self.name,
+            'hyperparameters': self.hyperparameters,
+            'episode_rewards': self.episode_rewards,
+            'episode_lengths': self.episode_lengths,
+            'training_time': self.training_time,
+            'convergence_episode': self.convergence_episode,
+            # Sauvegarder V(s) et policy
+            'V': self.V,
+            'policy': self.policy,
+            'states': self.states,
+            'actions': self.actions,
+            'gamma': self.gamma,
+            'theta': self.theta
+        }
+        
+        with open(path, 'wb') as f:
+            pickle.dump(save_data, f)
+        
+        print(f"[OK] Agent sauvegarde avec V(s) et policy : {path}")
+    
+    def load(self, path):
+        """
+        Charge un agent avec V(s) et policy complètes
+        """
+        import pickle
+        
+        with open(path, 'rb') as f:
+            save_data = pickle.load(f)
+        
+        self.name = save_data['name']
+        self.hyperparameters = save_data['hyperparameters']
+        self.episode_rewards = save_data['episode_rewards']
+        self.episode_lengths = save_data['episode_lengths']
+        self.training_time = save_data['training_time']
+        self.convergence_episode = save_data.get('convergence_episode')
+        
+        # Charger V(s) et policy
+        if 'V' in save_data:
+            self.V = save_data['V']
+        if 'policy' in save_data:
+            self.policy = save_data['policy']
+        if 'states' in save_data:
+            self.states = save_data['states']
+        if 'actions' in save_data:
+            self.actions = save_data['actions']
+        if 'gamma' in save_data:
+            self.gamma = save_data['gamma']
+        if 'theta' in save_data:
+            self.theta = save_data['theta']
+        
+        print(f"[OK] Agent charge avec V(s) et policy : {path}")

@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+# Ajouter le répertoire parent au path pour les imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pygame
 from envs.lineworld import LineWorld
 

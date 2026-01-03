@@ -46,6 +46,9 @@ class ValueIteration(BaseAgent):
                 self.actions.add(a)
             self.states = list(self.states)
             self.actions = list(self.actions)
+        elif hasattr(self.env, 'secret_env') and hasattr(self.env.secret_env, 'num_states'):
+            # Environnement secret avec méthodes MDP
+            self._build_model_from_mdp()
         else:
             # Construire le modèle en explorant
             self._build_model()
@@ -55,8 +58,15 @@ class ValueIteration(BaseAgent):
             self.V[s] = 0.0
     
     def _build_model(self):
-        """Construit le modèle MDP en explorant l'environnement"""
-        # Pour environnements simples
+        """
+        Construit le modèle MDP en explorant l'environnement systématiquement.
+        
+        Même principe que Policy Iteration : on teste toutes les transitions (s, a)
+        pour construire le modèle complet p(s', r | s, a).
+        
+        Voir _build_model() dans policy_iteration.py pour les détails.
+        """
+        # ÉTAPE 1 : Identifier tous les états et actions
         if hasattr(self.env, 'length'):
             # LineWorld
             self.states = list(range(self.env.length))
@@ -69,25 +79,73 @@ class ValueIteration(BaseAgent):
         else:
             raise ValueError("Environnement non supporte pour Value Iteration")
         
-        # Construire le modèle
+        # ÉTAPE 2 : Tester toutes les transitions
+        print(f"Construction du modèle MDP : {len(self.states)} états × {len(self.actions)} actions = {len(self.states) * len(self.actions)} transitions à tester...")
+        
         for s in self.states:
             for a in self.actions:
                 try:
+                    # Sauvegarder l'état actuel
                     old_state = getattr(self.env, 'state', None)
+                    old_done = getattr(self.env, 'done', False)
+                    
+                    # Forcer l'état à s et exécuter l'action a
                     self.env.reset()
                     if hasattr(self.env, 'state'):
                         self.env.state = s
+                    if hasattr(self.env, 'done'):
+                        self.env.done = False
                     
+                    # Tester la transition
                     s_next, r, done, _ = self.env.step(a)
                     r = round(r, 1)
                     
+                    # Enregistrer dans le modèle
                     key = (s, a, s_next, r)
-                    self.model[key] = 1.0
+                    self.model[key] = 1.0  # Déterministe
                     
+                    # Restaurer l'état
                     if old_state is not None:
                         self.env.state = old_state
+                    if hasattr(self.env, 'done'):
+                        self.env.done = old_done
                 except:
                     pass
+        
+        print(f"[OK] Modele MDP construit : {len(self.model)} transitions enregistrees")
+    
+    def _build_model_from_mdp(self):
+        """
+        Construit le modèle MDP à partir des méthodes MDP de l'environnement secret.
+        
+        Les environnements secrets fournissent :
+        - num_states() : nombre d'états
+        - num_actions() : nombre d'actions
+        - num_rewards() : nombre de rewards possibles
+        - p(s, a, s_p, r_index) : probabilité de transition
+        - reward(r_index) : valeur du reward
+        """
+        secret_env = self.env.secret_env
+        num_states = secret_env.num_states()
+        num_actions = secret_env.num_actions()
+        num_rewards = secret_env.num_rewards()
+        
+        self.states = list(range(num_states))
+        self.actions = list(range(num_actions))
+        
+        print(f"Construction du modèle MDP depuis méthodes MDP : {num_states} états × {num_actions} actions...")
+        
+        for s in self.states:
+            for a in self.actions:
+                for s_next in range(num_states):
+                    for r_idx in range(num_rewards):
+                        prob = secret_env.p(s, a, s_next, r_idx)
+                        if prob > 0:
+                            reward = secret_env.reward(r_idx)
+                            key = (s, a, s_next, reward)
+                            self.model[key] = prob
+        
+        print(f"[OK] Modele MDP construit : {len(self.model)} transitions enregistrees")
     
     def train(self, num_episodes=1000, verbose=True):
         """

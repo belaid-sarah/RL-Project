@@ -190,7 +190,7 @@ class TwoRoundRPS(BaseEnv):
         print(f"{'='*50}")
         
         if self.round == 0:
-            print("🎮 Ready to start! Choose your action for Round 1")
+            print("Ready to start! Choose your action for Round 1")
             print("Actions: 0=Rock, 1=Paper, 2=Scissors")
         
         elif self.round == 1:
@@ -198,8 +198,8 @@ class TwoRoundRPS(BaseEnv):
             print(f"  You played: {self.actions[self.agent_round1_choice]}")
             print(f"  Opponent played: {self.actions[self.opponent_round1_choice]}")
             print(f"  Result: {'+1' if self.round1_reward == 1 else '0' if self.round1_reward == 0 else '-1'}")
-            print(f"\n🎮 Choose your action for Round 2")
-            print(f"💡 Hint: Opponent will play '{self.actions[self.agent_round1_choice]}'")
+            print(f"\nChoose your action for Round 2")
+            print(f"Hint: Opponent will play '{self.actions[self.agent_round1_choice]}'")
         
         elif self.round == 2:
             print(f"\n📍 ROUND 1")
@@ -210,12 +210,12 @@ class TwoRoundRPS(BaseEnv):
             print(f"  You: {self.actions[self.agent_round2_choice]} vs Opponent: {self.actions[self.opponent_round2_choice]}")
             print(f"  Reward: {self.round2_reward:+d}")
             
-            print(f"\n🏆 TOTAL REWARD: {self.total_reward:+d}")
+            print(f"\nTOTAL REWARD: {self.total_reward:+d}")
             
             if self.total_reward > 0:
-                print("✅ You WIN the game!")
+                print("[WIN] You WIN the game!")
             elif self.total_reward < 0:
-                print("❌ You LOSE the game!")
+                print("[LOSE] You LOSE the game!")
             else:
                 print("🤝 DRAW game!")
         

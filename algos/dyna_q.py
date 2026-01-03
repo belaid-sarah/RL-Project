@@ -17,12 +17,14 @@ class DynaQAgent(BaseAgent):
     Combine Q-Learning avec planning
     """
     
-    def __init__(self, env, alpha=0.1, gamma=0.99, epsilon=0.1, n_planning_steps=5, **kwargs):
+    def __init__(self, env, alpha=0.1, gamma=0.99, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.05, n_planning_steps=5, **kwargs):
         super().__init__(env, name="Dyna-Q", alpha=alpha, gamma=gamma, epsilon=epsilon, 
                         n_planning_steps=n_planning_steps, **kwargs)
         self.alpha = alpha
         self.gamma = gamma
-        self.epsilon = epsilon
+        self.epsilon = epsilon  # Exploration initiale
+        self.epsilon_decay = epsilon_decay  # Décroissance de l'exploration
+        self.epsilon_min = epsilon_min  # Exploration minimale
         self.n_planning_steps = n_planning_steps
         
         # Q-table: Q(s, a)
@@ -148,7 +150,10 @@ class DynaQAgent(BaseAgent):
             self.episode_rewards.append(total_reward)
             self.episode_lengths.append(steps)
             
+            # Décroissance de l'exploration
+            self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+            
             if verbose and (episode + 1) % 100 == 0:
-                print(f"Episode {episode+1}/{num_episodes} | Reward: {total_reward:.2f} | Steps: {steps}")
+                print(f"Episode {episode+1}/{num_episodes} | Reward: {total_reward:.2f} | Steps: {steps} | Epsilon: {self.epsilon:.3f}")
         
         self.training_time = time.time() - start_time

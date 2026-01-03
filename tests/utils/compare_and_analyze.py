@@ -3,9 +3,14 @@ Script pour comparer les algorithmes et analyser les résultats
 Génère des rapports détaillés et des comparaisons
 """
 
+import sys
+from pathlib import Path
+
+# Ajouter le répertoire parent au path pour les imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 import json
 import numpy as np
-from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 
@@ -13,7 +18,7 @@ def load_results(results_dir='results'):
     """Charge tous les résultats depuis le dossier results"""
     results_dir = Path(results_dir)
     if not results_dir.exists():
-        print(f"❌ Le dossier {results_dir} n'existe pas")
+        print(f"[ERROR] Le dossier {results_dir} n'existe pas")
         return []
     
     all_results = []
@@ -47,7 +52,7 @@ def analyze_results(results):
         by_algorithm[algo_name].append(result)
     
     # Statistiques par algorithme
-    print("\n📊 STATISTIQUES PAR ALGORITHME")
+    print("\nSTATISTIQUES PAR ALGORITHME")
     print("-"*80)
     
     algo_stats = []
@@ -83,7 +88,7 @@ def analyze_results(results):
     # Meilleur algorithme
     if algo_stats:
         best = algo_stats[0]
-        print(f"\n🏆 MEILLEUR ALGORITHME: {best['name']}")
+        print(f"\n[MEILLEUR] MEILLEUR ALGORITHME: {best['name']}")
         print(f"   Récompense moyenne: {best['mean_reward']:.2f} ± {best['std_reward']:.2f}")
         print(f"   Taux de succès: {best['mean_success']:.1f}%")
         print(f"   Temps moyen: {best['mean_time']:.2f}s")
@@ -137,7 +142,7 @@ def analyze_results(results):
     with open(report_file, 'w') as f:
         json.dump(report, f, indent=2, default=str)
     
-    print(f"\n✅ Rapport détaillé sauvegardé: {report_file}")
+    print(f"\n[OK] Rapport detaille sauvegarde: {report_file}")
     
     return report
 
@@ -150,7 +155,7 @@ def compare_hyperparameters(results):
     # Q-Learning: alpha
     ql_results = [r for r in results if 'Q-Learning' in r.get('algorithm', '')]
     if ql_results:
-        print("\n📈 Q-Learning - Impact de alpha:")
+        print("\nQ-Learning - Impact de alpha:")
         alpha_perf = defaultdict(list)
         for r in ql_results:
             alpha = r.get('hyperparameters', {}).get('alpha')
@@ -164,7 +169,7 @@ def compare_hyperparameters(results):
     # Dyna-Q: n_planning_steps
     dyna_results = [r for r in results if 'Dyna-Q' in r.get('algorithm', '')]
     if dyna_results:
-        print("\n📈 Dyna-Q - Impact de n_planning_steps:")
+        print("\nDyna-Q - Impact de n_planning_steps:")
         n_perf = defaultdict(list)
         for r in dyna_results:
             n = r.get('hyperparameters', {}).get('n_planning_steps')
@@ -187,11 +192,11 @@ if __name__ == "__main__":
     results = load_results(args.results_dir)
     
     if results:
-        print(f"✅ {len(results)} résultats chargés")
+        print(f"[OK] {len(results)} resultats charges")
         analyze_results(results)
         compare_hyperparameters(results)
     else:
-        print("❌ Aucun résultat trouvé. Exécutez d'abord des tests:")
+        print("[ERROR] Aucun resultat trouve. Executez d'abord des tests:")
         print("   python test_with_visualization.py --compare")
         print("   python test_all_algos_envs.py --all")
 
