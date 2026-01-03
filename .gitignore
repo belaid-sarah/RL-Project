@@ -47,9 +47,8 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
-# Documentation (exclude all .md files except README.md)
+# Documentation (exclude all .md files)
 *.md
-!README.md
 
 # Temporary files
 *.tmp
