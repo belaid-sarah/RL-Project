@@ -36,9 +36,8 @@ ENV/
 models/*.pkl
 results/*.json
 *.log
-test_*.py
-*_test.py
 results_best_algo.txt
+# Note: test_*.py and *_test.py removed to allow tests/ directory
 
 # OS
 .DS_Store
