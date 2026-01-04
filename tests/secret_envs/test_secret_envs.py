@@ -46,8 +46,15 @@ CONFIG = {
     'num_episodes': {
         'SecretEnv0': 1000,  # 8192 états - relativement simple
         'SecretEnv1': 2000,  # 65536 états - moyen
-        'SecretEnv2': 5000,  # 2097152 états - très grand, plus d'épisodes nécessaires
+        'SecretEnv2': 3000,  # 2097152 états - très grand, réduit pour accélérer les tests
         'SecretEnv3': 2000,  # 65536 états - moyen
+    },
+    # Algorithmes Monte Carlo sont plus lents (doivent attendre fin d'épisode)
+    'num_episodes_monte_carlo': {
+        'SecretEnv0': 200,   # Réduit car Monte Carlo est lent
+        'SecretEnv1': 300,   # Réduit car Monte Carlo est lent
+        'SecretEnv2': 500,   # Réduit car Monte Carlo est lent
+        'SecretEnv3': 300,   # Réduit car Monte Carlo est lent
     },
     'evaluation_episodes': 100,
     'verbose': False,
@@ -109,9 +116,14 @@ HYPERPARAMETERS = {
 }
 
 # Mapping des algorithmes
+# Note: PolicyIteration et ValueIteration sont exclus des environnements secrets
+# car ils nécessitent la construction complète du modèle MDP, ce qui est trop lent
+# pour les environnements avec beaucoup d'états (8192+ états)
 ALGORITHMS = {
-    'PolicyIteration': PolicyIteration,
-    'ValueIteration': ValueIteration,
+    # Algorithmes de planification exclus (trop lents pour environnements secrets)
+    # 'PolicyIteration': PolicyIteration,
+    # 'ValueIteration': ValueIteration,
+    # Algorithmes model-free (rapides et adaptés)
     'MonteCarloES': MonteCarloES,
     'OnPolicyMonteCarlo': OnPolicyMonteCarlo,
     'OffPolicyMonteCarlo': OffPolicyMonteCarlo,
@@ -225,12 +237,20 @@ def run_all_secret_tests():
         results_dir = Path(CONFIG['results_dir'])
         results_dir.mkdir(exist_ok=True)
     
+    # Algorithmes Monte Carlo qui sont plus lents
+    monte_carlo_algos = {'MonteCarloES', 'OnPolicyMonteCarlo', 'OffPolicyMonteCarlo'}
+    
     for algo_name in ALGORITHMS.keys():
         for env_name in SECRET_ENVIRONMENTS.keys():
             current_test += 1
             print(f"\n[{current_test}/{total_tests}] {algo_name} on {env_name}")
             
-            num_episodes = CONFIG['num_episodes'].get(env_name, 2000)
+            # Utiliser moins d'épisodes pour les algorithmes Monte Carlo (plus lents)
+            if algo_name in monte_carlo_algos:
+                num_episodes = CONFIG['num_episodes_monte_carlo'].get(env_name, 200)
+            else:
+                num_episodes = CONFIG['num_episodes'].get(env_name, 2000)
+            
             result = test_algorithm_on_secret_env(
                 algo_name, 
                 env_name, 

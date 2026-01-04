@@ -63,17 +63,24 @@ class MonteCarloES(BaseAgent):
             episode_data = []
             done = False
             total_reward = 0
+            max_steps_per_episode = 1000  # Limite pour éviter les épisodes trop longs
             
-            while not done:
+            step_count = 0
+            while not done and step_count < max_steps_per_episode:
                 next_state, reward, done, _ = self.env.step(action)
                 episode_data.append((state, action, reward))
                 total_reward += reward
+                step_count += 1
                 
                 if not done:
                     state = next_state
                     action = self.select_action(state, training=True)
                 else:
                     state = next_state
+            
+            # Forcer done si on a atteint la limite
+            if step_count >= max_steps_per_episode:
+                done = True
             
             # Calculer returns (first-visit)
             G = 0
@@ -161,13 +168,20 @@ class OnPolicyMonteCarlo(BaseAgent):
             episode_data = []
             done = False
             total_reward = 0
+            max_steps_per_episode = 1000  # Limite pour éviter les épisodes trop longs
             
-            while not done:
+            step_count = 0
+            while not done and step_count < max_steps_per_episode:
                 action = self.select_action(state, training=True)
                 next_state, reward, done, _ = self.env.step(action)
                 episode_data.append((state, action, reward))
                 total_reward += reward
                 state = next_state
+                step_count += 1
+            
+            # Forcer done si on a atteint la limite
+            if step_count >= max_steps_per_episode:
+                done = True
             
             # Calculer returns (first-visit)
             G = 0
@@ -262,13 +276,20 @@ class OffPolicyMonteCarlo(BaseAgent):
             episode_data = []
             done = False
             total_reward = 0
+            max_steps_per_episode = 1000  # Limite pour éviter les épisodes trop longs
             
-            while not done:
+            step_count = 0
+            while not done and step_count < max_steps_per_episode:
                 action = self._behavior_policy(state)
                 next_state, reward, done, _ = self.env.step(action)
                 episode_data.append((state, action, reward))
                 total_reward += reward
                 state = next_state
+                step_count += 1
+            
+            # Forcer done si on a atteint la limite
+            if step_count >= max_steps_per_episode:
+                done = True
             
             # Calculer returns avec importance sampling
             G = 0
